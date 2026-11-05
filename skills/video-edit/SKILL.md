@@ -1,15 +1,15 @@
 ---
 name: video-edit
-description: Plan and assist with video-editing projects in Frame Studio, including clip organization, trimming plans, captions, audio, color, and export checks.
+description: Plan and assist with video-editing projects in TEa.G3-studio, including clip organization, trimming plans, captions, audio, color, and export checks.
 ---
 
-# Video Editing Skill — Frame Studio
+# Video Editing Skill — TEa.G3-studio
 
-Use this skill when the user asks to plan, organize, or perform video-editing work in Frame Studio.
+Use this skill when the user asks to plan, organize, or perform video-editing work in TEa.G3-studio.
 
 ## Core behavior
 
-- Treat Frame Studio as a local-first editor. Keep editing workflows usable offline whenever possible.
+- Treat TEa.G3-studio as a local-first editor. Keep editing workflows usable offline whenever possible.
 - First inspect the available project files and the actual capabilities implemented in the current app version.
 - Never claim that a trim, transition, filter, caption, or export has been rendered unless the app or media engine confirms it.
 - In the current MVP, in/out points are project metadata only. Do not describe them as an exported trim.
