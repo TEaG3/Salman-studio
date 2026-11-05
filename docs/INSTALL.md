@@ -18,6 +18,10 @@ flutter run
 The script runs Flutter's official Android project generator, then applies:
 - App display name: `TEa.G3-studio`
 - Android application ID: `com.teag3.studio`
+- Minimum Android API: 23
+- AndroidX Media3 Transformer: `1.11.1`
+
+The generated native Android project contains a MethodChannel bridge for single-clip trimming and MP4 export. Export files are currently stored in the app's private documents directory.
 
 ## Build Android
 ```bash
