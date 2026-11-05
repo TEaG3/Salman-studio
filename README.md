@@ -1,12 +1,31 @@
 # TEa.G3-studio
 
-A local-first Flutter video-editing app. Android is the first native target; iOS is deferred.
+TEa.G3-studio is being developed as a hybrid AI creative-production platform for personal video editing, portraits and image work, motion graphics, animation, bilingual typography, audio, and advertising. Android is the first native target; iOS is deferred.
 
-The Android editor supports local video import, source preview, a clip list, saved in/out points, local JSON project persistence, a validated sequential edit-decision-list (EDL), and single-clip MP4 trimming through Jetpack Media3 Transformer.
+## Current Android app
+
+The Flutter Android editor supports local video import, source preview, a clip list, saved in/out points, local JSON project persistence, and single-clip MP4 trimming through Jetpack Media3 Transformer. It is not yet a full multi-track editor.
+
+## Backend foundation (new)
+
+A local Python/FastAPI starter is available in `backend/`. It includes a SQLite database schema for projects, assets, tracks, clips, captions, effects, transitions, edit plans, render jobs, AI sessions, and provider usage. It provides project create/list/read endpoints and a deterministic Arabic/English creative-brief planner.
+
+Run it locally:
+
+```bash
+cd backend
+python -m venv .venv
+# Windows: .venv\\Scripts\\activate
+# macOS/Linux: source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app:app --reload
+```
+
+Open `http://127.0.0.1:8000/docs`. The backend is for local development only; it has no authentication and must not be exposed to the public internet.
 
 ## Prepare Android
 
-Install the Flutter stable SDK, Android Studio, and the Android SDK. From the repository root run:
+Install Flutter stable, Android Studio, and the Android SDK. From the repository root:
 
 ```bash
 bash tool/configure_platforms.sh
@@ -15,7 +34,7 @@ flutter test
 flutter run
 ```
 
-The script generates the official Android Flutter scaffolding, sets the display name to **TEa.G3-studio**, sets the Android application ID to `com.teag3.studio`, adds the Media3 Transformer dependency, and runs `flutter pub get`.
+The script generates Android scaffolding, sets the display name to **TEa.G3-studio**, sets application ID `com.teag3.studio`, adds Media3 Transformer, and runs `flutter pub get`.
 
 ## Build Android
 
@@ -23,18 +42,25 @@ The script generates the official Android Flutter scaffolding, sets the display 
 flutter build apk --release
 ```
 
-GitHub Actions runs analysis, tests, and an Android release build for pull requests and publishes the APK as a workflow artifact.
+GitHub Actions is configured to run Flutter analysis, tests, and a release APK build for pull requests.
 
 ## Current limitations
 
-- MP4 export currently trims one selected source clip. Concatenating multiple clips, multi-track editing, transitions, overlays, audio mixing, and frame-accurate timeline preview are not implemented yet.
-- Export files are stored in the app's private documents directory; a user-facing gallery/share destination is a follow-up task.
-- The AI assistant is a placeholder. No media or prompts are sent to a cloud provider.
-- The web editor, backend API, MCP server, ChatGPT app integration, and Claude MCP integration are not deployed yet.
-- Android release signing for a store release still needs a private signing key and protected CI secrets. Never commit signing keys or API secrets.
+- The Android export currently trims one selected source clip. Multi-clip composition, multi-track editing, transitions, overlays, audio mixing, and frame-accurate timeline preview are not implemented.
+- The Python planner currently creates draft plans only; it does not generate images/videos or render media.
+- No ComfyUI, Diffusers, open video model, hosted generation API, or FFmpeg multi-track renderer has been connected yet.
+- The backend has no authentication, multi-user authorization, upload service, or production deployment. Keep it local.
+- ChatGPT/Claude/Gemini/Kimi/DeepSeek tool integrations are not published or end-to-end tested.
+- No custom TEa.G3 foundation model has been trained.
+- Store signing requires a private key and protected secrets. Never commit signing keys or provider API keys.
 
-## AI editing skills
+## Architecture and development notes
 
-This repository includes the `video-edit` skill for Claude Code and Codex-compatible agents. Skills provide instructions; they do not themselves connect to ChatGPT or Claude services or execute editing operations.
+- [Platform architecture](docs/PLATFORM-ARCHITECTURE.md)
+- [AI and model roadmap](docs/AI-AND-MODEL-ROADMAP.md)
+- [Open model and media-engine strategy](docs/OPEN-SOURCE-MODEL-STACK.md)
+- [Database model](docs/DATA-MODEL.md)
+- [Production algorithm](docs/PRODUCTION-ALGORITHM.md)
+- [Backend setup](backend/README.md)
 
-See [docs/ROADMAP.md](docs/ROADMAP.md), [docs/PLATFORM-ARCHITECTURE.md](docs/PLATFORM-ARCHITECTURE.md), and [docs/AI-AND-MODEL-ROADMAP.md](docs/AI-AND-MODEL-ROADMAP.md).
+Media files should remain local by default. Any cloud upload or paid provider use must be opt-in and clearly disclosed. Keep credentials in a secure server-side secret store, never in Flutter or Git.
