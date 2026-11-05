@@ -56,14 +56,16 @@ else:
 if count != 1:
     raise SystemExit("Could not safely set Android applicationId.")
 if "androidx.media3:media3-transformer" not in gradle_text:
-    gradle_text, dependency_count = re.subn(
-        r'dependencies\s*\{',
-        lambda match: match.group(0) + "\n" + dependency,
-        gradle_text,
-        count=1,
-    )
-    if dependency_count != 1:
-        raise SystemExit("Could not add the Media3 Transformer dependency.")
+    if re.search(r'\ndependencies\s*\{', gradle_text):
+        gradle_text = re.sub(
+            r'(\ndependencies\s*\{)',
+            lambda match: match.group(1) + "\n" + dependency,
+            gradle_text,
+            count=1,
+        )
+    else:
+        # New Flutter Kotlin DSL templates may not contain a dependencies block.
+        gradle_text = gradle_text.rstrip() + "\n\ndependencies {\n" + dependency + "\n}\n"
 gradle.write_text(gradle_text)
 
 main_activity = next((root / "android/app/src/main/kotlin").rglob("MainActivity.kt"), None)
