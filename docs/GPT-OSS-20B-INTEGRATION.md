@@ -77,4 +77,4 @@ No paid API, paid agent subscription, automatic upgrade, or paid fallback is req
 
 ## Current status
 
-This repository change records the model decision and integration contract. It does not install model weights, provision a GPU, run benchmarks, connect media-generation engines, or claim that GPT-OSS is already serving requests. The existing FastAPI backend remains local-development-only until authentication, PostgreSQL, and secure storage are implemented.
+The repository now contains an optional Ollama adapter and local-only FastAPI endpoints (`GET /v1/ai/status`, `POST /v1/ai/chat`) plus mocked adapter tests. This is not evidence of a real inference run: model weights still need to be downloaded and Ollama must be running on the target computer. No image/video/audio engines are connected. The existing FastAPI backend remains local-development-only until authentication, PostgreSQL, and secure storage are implemented.
