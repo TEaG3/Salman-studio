@@ -11,3 +11,13 @@ ios/Pods/
 ios/.symlinks/
 android/.gradle/
 android/local.properties
+
+# Python backend local data and environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+backend/data/
+.env
+.env.*
+!.env.example
