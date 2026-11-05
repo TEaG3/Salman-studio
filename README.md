@@ -30,3 +30,33 @@ flutter build ios --release
 - iOS signing and device testing must be completed in Xcode on macOS.
 
 See [docs/ROADMAP.md](docs/ROADMAP.md) for planned milestones.
+
+
+## AI editing skills
+
+This repository includes the `video-edit` skill for:
+- Claude Code: `.claude/skills/video-edit/SKILL.md`
+- OpenAI Codex-compatible agents: `.agents/skills/video-edit/SKILL.md`
+- Shared source: `skills/video-edit/SKILL.md`
+
+Install both user-level copies:
+```bash
+bash install.sh
+```
+
+Install only Claude Code:
+```bash
+bash install.sh --claude
+```
+
+Install only Codex-compatible agents:
+```bash
+bash install.sh --codex
+```
+
+Install into this repository checkout:
+```bash
+bash install.sh --project
+```
+
+See [docs/AI_SKILLS.md](docs/AI_SKILLS.md) and [docs/INSTALL.md](docs/INSTALL.md).
