@@ -4,21 +4,60 @@
   "title": "TEa.G3 Edit Decision List",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "projectId", "status", "timeline"],
+  "required": [
+    "schemaVersion",
+    "projectId",
+    "status",
+    "timeline"
+  ],
   "properties": {
-    "schemaVersion": { "type": "string", "const": "1.0" },
-    "projectId": { "type": "string", "minLength": 1 },
-    "status": { "type": "string", "enum": ["draft", "validated", "approved", "rendering", "rendered", "failed"] },
+    "schemaVersion": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "projectId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "validated",
+        "approved",
+        "rendering",
+        "rendered",
+        "failed"
+      ]
+    },
     "profile": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "width": { "type": "integer", "minimum": 1 },
-        "height": { "type": "integer", "minimum": 1 },
-        "frameRate": { "type": "number", "exclusiveMinimum": 0 },
-        "videoCodec": { "type": "string" },
-        "audioCodec": { "type": "string" },
-        "container": { "type": "string", "enum": ["mp4"] }
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "frameRate": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "videoCodec": {
+          "type": "string"
+        },
+        "audioCodec": {
+          "type": "string"
+        },
+        "container": {
+          "type": "string",
+          "enum": [
+            "mp4"
+          ]
+        }
       }
     },
     "timeline": {
@@ -26,14 +65,54 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["clipId", "sourceInMs", "sourceOutMs", "timelineStartMs"],
+        "required": [
+          "clipId",
+          "sourceInMs",
+          "sourceOutMs",
+          "timelineStartMs"
+        ],
         "properties": {
-          "clipId": { "type": "string", "minLength": 1 },
-          "sourceInMs": { "type": "integer", "minimum": 0 },
-          "sourceOutMs": { "type": "integer", "minimum": 1 },
-          "timelineStartMs": { "type": "integer", "minimum": 0 },
-          "volume": { "type": "number", "minimum": 0, "maximum": 4 },
-          "captionTrackId": { "type": "string" }
+          "clipId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sourceInMs": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sourceOutMs": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "timelineStartMs": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "volume": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 4
+          },
+          "captionTrackId": {
+            "type": "string"
+          },
+          "trackId": {
+            "type": "string"
+          },
+          "speed": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 8
+          },
+          "opacity": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "transform": {
+            "type": "object",
+            "additionalProperties": true
+          }
         }
       }
     },
@@ -42,17 +121,158 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "text", "startMs", "endMs", "language"],
+        "required": [
+          "id",
+          "text",
+          "startMs",
+          "endMs",
+          "language"
+        ],
         "properties": {
-          "id": { "type": "string" },
-          "text": { "type": "string" },
-          "startMs": { "type": "integer", "minimum": 0 },
-          "endMs": { "type": "integer", "minimum": 1 },
-          "language": { "type": "string" },
-          "direction": { "type": "string", "enum": ["ltr", "rtl"] }
+          "id": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "startMs": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "endMs": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "language": {
+            "type": "string"
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "ltr",
+              "rtl"
+            ]
+          }
         }
       }
     },
-    "notes": { "type": "array", "items": { "type": "string" } }
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "tracks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "kind",
+          "name",
+          "position"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "video",
+              "audio",
+              "text",
+              "graphics",
+              "effects"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "position": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "muted": {
+            "type": "boolean"
+          },
+          "locked": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "effects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "effectType",
+          "parameters"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "clipId": {
+            "type": "string"
+          },
+          "effectType": {
+            "type": "string"
+          },
+          "startMs": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "endMs": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "parameters": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      }
+    },
+    "transitions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "fromClipId",
+          "toClipId",
+          "transitionType",
+          "durationMs"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "fromClipId": {
+            "type": "string"
+          },
+          "toClipId": {
+            "type": "string"
+          },
+          "transitionType": {
+            "type": "string"
+          },
+          "durationMs": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "parameters": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      }
+    }
   }
 }
