@@ -52,9 +52,19 @@ if info.exists():
 project = root / "ios/Runner.xcodeproj/project.pbxproj"
 if project.exists():
     text = project.read_text()
+
+    def replace_bundle_id(match):
+        current = match.group(1).strip()
+        suffix = ""
+        for test_suffix in (".RunnerTests", ".RunnerUITests"):
+            if current.endswith(test_suffix):
+                suffix = test_suffix
+                break
+        return f"PRODUCT_BUNDLE_IDENTIFIER = {bundle_id}{suffix};"
+
     text = re.sub(
-        r'PRODUCT_BUNDLE_IDENTIFIER = [^;]+;',
-        f'PRODUCT_BUNDLE_IDENTIFIER = {bundle_id};',
+        r'PRODUCT_BUNDLE_IDENTIFIER = ([^;]+);',
+        replace_bundle_id,
         text,
     )
     project.write_text(text)
