@@ -143,7 +143,7 @@ class _EditorScreenState extends State<EditorScreen> {
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('مساعد Frame Studio'),
+        title: const Text('مساعد TEa.G3-studio'),
         content: Text(response),
         actions: [
           TextButton(
@@ -180,7 +180,7 @@ class _EditorScreenState extends State<EditorScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Frame Studio'),
+        title: const Text('TEa.G3-studio'),
         actions: [
           IconButton(onPressed: _showAi, icon: const Icon(Icons.auto_awesome), tooltip: 'مساعد AI'),
           IconButton(onPressed: _save, icon: const Icon(Icons.save_outlined), tooltip: 'حفظ'),

@@ -3,16 +3,16 @@ import 'screens/editor_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const FrameStudioApp());
+  runApp(const TeaG3StudioApp());
 }
 
-class FrameStudioApp extends StatelessWidget {
-  const FrameStudioApp({super.key});
+class TeaG3StudioApp extends StatelessWidget {
+  const TeaG3StudioApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Frame Studio',
+      title: 'TEa.G3-studio',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
