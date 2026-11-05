@@ -34,7 +34,7 @@ Arabic/English text, especially Arabic right-to-left shaping, should remain an e
 
 Initial local evaluation target:
 - Ollama model reference: `gpt-oss:20b`
-- OpenAI-compatible local endpoint: `http://127.0.0.1:11434/v1`
+- Ollama native local API used by the adapter: `http://127.0.0.1:11434/api/chat`
 - Model download/run instructions: see the official model card and Ollama's current documentation.
 
 The model card indicates the quantized 20B model can run within roughly 16 GB of memory, but actual requirements depend on quantization, context length, runtime overhead, and concurrent requests. Treat this as a feasibility guideline, not a guarantee for every device. Benchmark on the target hardware before enabling it.
