@@ -386,7 +386,7 @@ class _EditorScreenState extends State<EditorScreen> {
         ],
         const SizedBox(height: 6),
         const Text(
-          'هذه النسخة تحفظ نقاط القصّ كبيانات فقط؛ التصدير الفعلي سيضاف في المرحلة التالية.',
+          'يُصدّر المقطع المحدد فقط إلى MP4 داخل مجلد التطبيق. دمج المقاطع والمسارات المتعددة سيضاف لاحقاً.',
           style: TextStyle(fontSize: 11, color: Colors.white60),
         ),
       ],
