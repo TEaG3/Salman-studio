@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -6,6 +7,7 @@ import 'package:uuid/uuid.dart';
 import '../models/video_clip.dart';
 import '../services/ai_assistant_service.dart';
 import '../services/media_import_service.dart';
+import '../services/media_export_service.dart';
 import '../services/project_store.dart';
 
 class EditorScreen extends StatefulWidget {
@@ -19,6 +21,7 @@ class _EditorScreenState extends State<EditorScreen> {
   final _importer = MediaImportService();
   final _store = ProjectStore();
   final _ai = AiAssistantService();
+  final _exporter = MediaExportService();
   final _uuid = const Uuid();
   final List<VideoClip> _clips = [];
 
@@ -27,6 +30,8 @@ class _EditorScreenState extends State<EditorScreen> {
   int _inMs = 0;
   int _outMs = 0;
   bool _busy = false;
+  bool _exporting = false;
+  double _exportProgress = 0;
 
   VideoClip? get _selected {
     for (final clip in _clips) {
@@ -153,6 +158,43 @@ class _EditorScreenState extends State<EditorScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _exportSelected() async {
+    final clip = _selected;
+    if (clip == null || _exporting) return;
+    if (_inMs < 0 || _outMs <= _inMs) {
+      _message('حدد بداية ونهاية صحيحتين قبل التصدير.');
+      return;
+    }
+
+    StreamSubscription<dynamic>? progressSubscription;
+    setState(() {
+      _exporting = true;
+      _exportProgress = 0;
+    });
+    try {
+      progressSubscription = MediaExportService.progressEvents
+          .receiveBroadcastStream()
+          .listen((value) {
+        if (!mounted || value is! num) return;
+        setState(() => _exportProgress = value.toDouble().clamp(0, 100) / 100);
+      });
+      final output = await _exporter.exportTrim(
+        clip.copyWith(startMs: _inMs, endMs: _outMs),
+      );
+      _message('اكتمل تصدير MP4: ${output.path}');
+    } catch (error) {
+      _message('تعذر تصدير الفيديو: $error');
+    } finally {
+      await progressSubscription?.cancel();
+      if (mounted) {
+        setState(() {
+          _exporting = false;
+          _exportProgress = 0;
+        });
+      }
+    }
   }
 
   String _time(int ms) {
@@ -330,6 +372,18 @@ class _EditorScreenState extends State<EditorScreen> {
           icon: const Icon(Icons.check),
           label: const Text('حفظ نقاط القصّ'),
         ),
+        const SizedBox(height: 8),
+        FilledButton.icon(
+          onPressed: _exporting ? null : _exportSelected,
+          icon: const Icon(Icons.movie_creation_outlined),
+          label: Text(_exporting ? 'جارٍ تصدير MP4' : 'تصدير المقطع MP4'),
+        ),
+        if (_exporting) ...[
+          const SizedBox(height: 8),
+          LinearProgressIndicator(value: _exportProgress == 0 ? null : _exportProgress),
+          const SizedBox(height: 4),
+          Text('التصدير: ${(_exportProgress * 100).round()}%'),
+        ],
         const SizedBox(height: 6),
         const Text(
           'هذه النسخة تحفظ نقاط القصّ كبيانات فقط؛ التصدير الفعلي سيضاف في المرحلة التالية.',
