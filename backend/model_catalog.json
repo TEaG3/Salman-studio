@@ -1,20 +1,134 @@
 {
-  "catalogVersion": "0.1.0",
-  "policy": "Candidates only. No model is considered installed, licensed for this deployment, or production-ready until its exact release and weights are reviewed.",
+  "catalogVersion": "0.2.0",
+  "policy": "Official open-weight candidates with model-card license notes. Local inference is optional and must be benchmarked on target hardware. No model is considered installed or production-ready until a real inference test passes.",
   "languageModels": [
-    {"id": "deepseek-open-weights", "family": "DeepSeek", "modality": ["text", "reasoning", "tool-planning"], "role": "creative brief planning, structured edit plans, tool selection", "deployment": ["local-self-hosted", "approved-hosted-api"], "status": "candidate", "visualGeneration": false},
-    {"id": "kimi-open-weights", "family": "Kimi", "modality": ["text", "reasoning", "tool-planning"], "role": "creative brief planning and long-context project assistance", "deployment": ["local-self-hosted", "approved-hosted-api"], "status": "candidate", "visualGeneration": false},
-    {"id": "qwen-open-weights", "family": "Qwen", "modality": ["text", "vision"], "role": "multimodal asset understanding and edit planning", "deployment": ["local-self-hosted", "approved-hosted-api"], "status": "candidate", "visualGeneration": false}
+    {
+      "id": "openai/gpt-oss-20b",
+      "family": "GPT-OSS",
+      "modality": [
+        "text",
+        "reasoning",
+        "tool-planning"
+      ],
+      "role": "Primary general AI Director candidate",
+      "license": "Apache-2.0",
+      "runtime": "Ollama local",
+      "status": "adapter-implemented-real-inference-pending",
+      "visualGeneration": false
+    },
+    {
+      "id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+      "family": "DeepSeek R1 Distill",
+      "modality": [
+        "text",
+        "reasoning",
+        "coding"
+      ],
+      "role": "Lightweight reasoning and second-opinion planner",
+      "license": "MIT (model card; derived from Qwen2.5)",
+      "runtime": "Local vLLM/SGLang OpenAI-compatible endpoint",
+      "status": "adapter-implemented-real-inference-pending",
+      "visualGeneration": false
+    },
+    {
+      "id": "moonshotai/Kimi-VL-A3B-Instruct",
+      "family": "Kimi-VL",
+      "modality": [
+        "text",
+        "vision",
+        "OCR",
+        "image-understanding",
+        "video-perception"
+      ],
+      "role": "Visual asset understanding, OCR, image and video review; multimodal creative assistant",
+      "license": "MIT (model card)",
+      "runtime": "Local vLLM/SGLang OpenAI-compatible endpoint",
+      "status": "text-adapter-implemented-vision-endpoint-not-yet-integrated",
+      "visualGeneration": false
+    },
+    {
+      "id": "moonshotai/Kimi-K2-Instruct",
+      "family": "Kimi K2",
+      "modality": [
+        "text",
+        "reasoning",
+        "tool-planning"
+      ],
+      "role": "Future high-resource agentic model evaluation",
+      "license": "Modified MIT (model card)",
+      "runtime": "High-resource distributed inference only",
+      "status": "deferred-hardware-cost",
+      "visualGeneration": false,
+      "notes": "1T total parameters; not a realistic default for free shared hosting."
+    }
   ],
   "imageEngines": [
-    {"id": "comfyui-image-workflows", "family": "ComfyUI-compatible checkpoints", "modality": ["text-to-image", "image-editing", "inpainting", "upscaling"], "role": "image creation and editing", "status": "candidate", "licenseReviewRequired": true}
+    {
+      "id": "comfyui-image-workflows",
+      "family": "ComfyUI-compatible checkpoints",
+      "modality": [
+        "text-to-image",
+        "image-editing",
+        "inpainting",
+        "upscaling"
+      ],
+      "role": "Image creation and editing",
+      "status": "candidate",
+      "licenseReviewRequired": true
+    }
   ],
   "videoEngines": [
-    {"id": "hunyuanvideo-family", "family": "HunyuanVideo", "modality": ["text-to-video", "image-to-video"], "role": "short generated scenes", "status": "candidate", "licenseReviewRequired": true, "hardwareReviewRequired": true},
-    {"id": "wan-family", "family": "Wan", "modality": ["text-to-video", "image-to-video"], "role": "short generated scenes and motion", "status": "candidate", "licenseReviewRequired": true, "hardwareReviewRequired": true},
-    {"id": "ltx-video-family", "family": "LTX-Video", "modality": ["text-to-video", "image-to-video"], "role": "short generated scenes", "status": "candidate", "licenseReviewRequired": true, "hardwareReviewRequired": true}
+    {
+      "id": "hunyuanvideo-family",
+      "family": "HunyuanVideo",
+      "modality": [
+        "text-to-video",
+        "image-to-video"
+      ],
+      "role": "Short generated scenes",
+      "status": "candidate",
+      "licenseReviewRequired": true,
+      "hardwareReviewRequired": true
+    },
+    {
+      "id": "wan-family",
+      "family": "Wan",
+      "modality": [
+        "text-to-video",
+        "image-to-video"
+      ],
+      "role": "Short generated scenes and motion",
+      "status": "candidate",
+      "licenseReviewRequired": true,
+      "hardwareReviewRequired": true
+    },
+    {
+      "id": "ltx-video-family",
+      "family": "LTX-Video",
+      "modality": [
+        "text-to-video",
+        "image-to-video"
+      ],
+      "role": "Short generated scenes",
+      "status": "candidate",
+      "licenseReviewRequired": true,
+      "hardwareReviewRequired": true
+    }
   ],
   "renderEngines": [
-    {"id": "ffmpeg", "family": "FFmpeg", "modality": ["video-encode", "audio-mix", "filters", "subtitles", "concat"], "role": "deterministic final assembly and export", "status": "planned", "licenseReviewRequired": true}
+    {
+      "id": "ffmpeg",
+      "family": "FFmpeg",
+      "modality": [
+        "video-encode",
+        "audio-mix",
+        "filters",
+        "subtitles",
+        "concat"
+      ],
+      "role": "Deterministic final assembly and export",
+      "status": "planned",
+      "licenseReviewRequired": true
+    }
   ]
 }
