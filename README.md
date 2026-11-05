@@ -65,6 +65,7 @@ GitHub Actions is configured to run Flutter analysis, tests, and a release APK b
 - [Platform architecture](docs/PLATFORM-ARCHITECTURE.md)
 - [Free-hosting architecture](docs/FREE-HOSTING-ARCHITECTURE.md)
 - [AI and model roadmap](docs/AI-AND-MODEL-ROADMAP.md)
+- [GPT-OSS 20B AI Director integration](docs/GPT-OSS-20B-INTEGRATION.md)
 - [Open model and media-engine strategy](docs/OPEN-SOURCE-MODEL-STACK.md)
 - [Database model](docs/DATA-MODEL.md)
 - [Production algorithm](docs/PRODUCTION-ALGORITHM.md)
