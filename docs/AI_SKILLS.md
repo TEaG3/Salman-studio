@@ -1,4 +1,4 @@
-# AI skills for Frame Studio
+# AI skills for TEa.G3-studio
 
 This repository provides a shared video-editing skill for two agent environments.
 
