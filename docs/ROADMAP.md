@@ -1,4 +1,4 @@
-# Frame Studio roadmap
+# TEa.G3-studio roadmap
 
 ## MVP foundation
 - [x] Flutter cross-platform app structure
