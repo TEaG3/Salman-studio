@@ -2,7 +2,10 @@ import asyncio
 
 import pytest
 
-import ai_director
+try:
+    import ai_director
+except ModuleNotFoundError:
+    from backend import ai_director
 
 
 def test_provider_is_disabled_by_default(monkeypatch):
