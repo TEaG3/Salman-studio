@@ -9,6 +9,10 @@ from pathlib import Path
 from uuid import uuid4
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
+try:
+    from .ai_director import DirectorChatInput, DirectorUnavailable, chat as director_chat, model_status
+except ImportError:  # supports `uvicorn app:app` from the backend directory
+    from ai_director import DirectorChatInput, DirectorUnavailable, chat as director_chat, model_status
 
 ROOT = Path(__file__).resolve().parent
 DB_PATH = Path(os.getenv("TEAG3_DATABASE_PATH", str(ROOT / "data" / "teag3.db")))
@@ -73,7 +77,7 @@ def health():
 
 @app.get("/v1/capabilities")
 def capabilities():
-    return {"operations": ["project.create", "project.list", "project.read", "plan.create"], "database": "sqlite", "imageGeneration": False, "videoGeneration": False, "rendering": False, "note": "Generation and rendering are not yet connected."}
+    return {"operations": ["project.create", "project.list", "project.read", "plan.create", "ai.status", "ai.chat"], "database": "sqlite", "imageGeneration": False, "videoGeneration": False, "rendering": False, "note": "Generation and rendering are not yet connected."}
 
 @app.post("/v1/projects", status_code=201)
 def create_project(payload: ProjectInput):
@@ -113,3 +117,18 @@ def create_plan(project_id: str, payload: PlanInput):
         conn.execute("INSERT INTO edit_plans(id,project_id,status,brief,plan_json,created_at) VALUES(?,?,?,?,?,?)", (plan_id, project_id, "draft", payload.brief, json.dumps(plan, ensure_ascii=False), now))
         conn.execute("UPDATE projects SET updated_at=? WHERE id=?", (now, project_id))
     return {"id": plan_id, "status": "draft", "plan": plan, "createdAt": now}
+
+
+@app.get("/v1/ai/status")
+async def ai_status():
+    """Report whether the optional local GPT-OSS runtime is enabled and reachable."""
+    return await model_status()
+
+
+@app.post("/v1/ai/chat")
+async def ai_chat(payload: DirectorChatInput):
+    """Send a text brief to the explicitly enabled local GPT-OSS model."""
+    try:
+        return await director_chat(payload.message, payload.language)
+    except DirectorUnavailable as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
