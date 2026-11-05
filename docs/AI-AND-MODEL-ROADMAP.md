@@ -63,3 +63,17 @@ The custom model is an optional provider behind the same gateway. If unavailable
 ## Not promised yet
 
 No custom model has been trained, hosted, or benchmarked at this stage. This document is a build plan, not evidence of a deployed model.
+
+
+## Adopted AI Director target — GPT-OSS 20B
+
+The project has selected `openai/gpt-oss-20b` as its preferred primary reasoning model for the AI Director, subject to runtime and hardware validation. It is a text model for planning, structured responses, and tool selection; it is not an image, video, or audio generator.
+
+The integration must remain optional and provider-neutral:
+- Prefer a local/self-hosted inference endpoint.
+- Keep `rule_based` planning as the offline and no-compute fallback.
+- Keep remote/paid inference disabled unless the user explicitly approves it.
+- Validate all outputs and proposed tool calls against TEa.G3 schemas, capability checks, permissions, and approval gates.
+- Do not send user media to remote services without explicit consent.
+
+See [GPT-OSS 20B integration](GPT-OSS-20B-INTEGRATION.md) for the decision, runtime assumptions, safety contract, and staged delivery. The model has not yet been installed, benchmarked, or connected in this repository.
