@@ -76,4 +76,4 @@ The integration must remain optional and provider-neutral:
 - Validate all outputs and proposed tool calls against TEa.G3 schemas, capability checks, permissions, and approval gates.
 - Do not send user media to remote services without explicit consent.
 
-See [GPT-OSS 20B integration](GPT-OSS-20B-INTEGRATION.md) for the decision, runtime assumptions, safety contract, and staged delivery. The model has not yet been installed, benchmarked, or connected in this repository.
+See [GPT-OSS 20B integration](GPT-OSS-20B-INTEGRATION.md) for the decision, runtime assumptions, safety contract, and staged delivery. A local Ollama adapter and status/chat API endpoints have been added, but a real model download, inference run, and hardware benchmark are still pending.
