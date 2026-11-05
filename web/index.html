@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b1020"><meta name="description" content="TEa.G3 Studio — استوديو الإبداع والتحرير">
+  <link rel="manifest" href="./manifest.json"><link rel="icon" href="./icon.svg" type="image/svg+xml"><link rel="stylesheet" href="./styles.css">
+  <title>TEa.G3 Studio</title>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="#" aria-label="TEa.G3 Studio"><span class="brand-mark">T<span>3</span></span><span><b>TEa.G3</b><small>CREATIVE STUDIO</small></span></a>
+    <div class="side-label">مساحة العمل</div>
+    <button class="nav-item active" data-view="home"><span>⌂</span> لوحة الاستوديو</button>
+    <button class="nav-item" data-view="projects"><span>▧</span> مشاريعي</button>
+    <button class="nav-item" data-view="media"><span>▣</span> مكتبة الوسائط</button>
+    <div class="side-label">أدوات الإنتاج</div>
+    <button class="nav-item" data-view="video"><span>▶</span> محرر الفيديو</button>
+    <button class="nav-item" data-view="image"><span>▧</span> استوديو الصور</button>
+    <button class="nav-item" data-view="audio"><span>♫</span> الصوت والتعليق</button>
+    <button class="nav-item" data-view="director"><span>✳</span> المخرج الذكي</button>
+    <div class="sidebar-bottom"><div class="status-dot"></div><span>وضع الويب التجريبي</span><button id="settingsBtn" class="icon-btn" title="الإعدادات">⚙</button></div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><button class="mobile-menu" id="menuBtn">☰</button><div><span class="eyebrow">مساحة الإبداع الخاصة بك</span><h1 id="pageTitle">لوحة الاستوديو</h1></div><div class="top-actions"><span class="device-pill">● متوافق مع iPad</span><button class="primary small" id="newProjectTop">＋ مشروع جديد</button></div></header>
+    <section class="content" id="homeView">
+      <div class="hero"><div class="hero-copy"><span class="hero-tag">CREATIVE PRODUCTION WORKSPACE</span><h2>حوّل أفكارك إلى<br><em>أعمال إبداعية.</em></h2><p>مساحة موحّدة لتنظيم مشاريع الفيديو والصور والصوت، مع أدوات ذكية قابلة للتوسّع.</p><div class="hero-actions"><button class="primary" id="newProject">＋ ابدأ مشروعاً</button><button class="secondary" id="importHero">↑ استيراد ملفات</button></div></div><div class="hero-art"><div class="orb orb-a"></div><div class="orb orb-b"></div><div class="glass-card"><div class="glass-top"><span>TEa.G3 / STUDIO</span><span class="live-dot"></span></div><div class="waveform"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="glass-caption">YOUR NEXT CREATION STARTS HERE</div></div></div></div>
+      <div class="section-heading"><div><span class="eyebrow">ابدأ بسرعة</span><h3>أدواتك الأساسية</h3></div></div>
+      <div class="tool-grid">
+        <button class="tool-card" data-view="video"><span class="tool-icon purple">▶</span><b>تحرير الفيديو</b><small>استيراد المقاطع وتنظيم مشروعك</small><span class="card-arrow">←</span></button>
+        <button class="tool-card" data-view="image"><span class="tool-icon cyan">▧</span><b>استوديو الصور</b><small>إدارة الصور وتجهيزها للمشروع</small><span class="card-arrow">←</span></button>
+        <button class="tool-card" data-view="audio"><span class="tool-icon amber">♫</span><b>الصوت والتعليق</b><small>مساحة مخصصة للصوت والملفات</small><span class="card-arrow">←</span></button>
+        <button class="tool-card" data-view="director"><span class="tool-icon green">✳</span><b>المخرج الذكي</b><small>حوّل وصفك إلى خطة إنتاج أولية</small><span class="card-arrow">←</span></button>
+      </div>
+      <div class="section-heading"><div><span class="eyebrow">متابعة العمل</span><h3>المشاريع الأخيرة</h3></div><button class="text-btn" data-view="projects">عرض الكل ←</button></div>
+      <div id="recentProjects" class="project-grid"><div class="empty-state">لا توجد مشاريع بعد. أنشئ مشروعك الأول للبدء.</div></div>
+      <div class="notice"><span>ⓘ</span><div><b>ملاحظة حول النسخة الحالية</b><p>هذه واجهة الويب الأولى. حفظ المشاريع محلي في هذا المتصفح. توليد الصور والفيديو، والتصدير السحابي، وتسجيل الدخول ستُفعّل بعد تجهيز خدماتها الخلفية واختبارها.</p></div></div>
+    </section>
+    <section class="content hidden" id="projectsView"><div class="section-heading"><div><span class="eyebrow">مساحة العمل</span><h3>مشاريعي</h3></div><button class="primary small" id="newProjectList">＋ مشروع جديد</button></div><div id="allProjects" class="project-grid"></div></section>
+    <section class="content hidden" id="mediaView"><div class="section-heading"><div><span class="eyebrow">ملفاتك</span><h3>مكتبة الوسائط</h3></div><button class="primary small" id="importMedia">↑ استيراد ملفات</button></div><div class="drop-zone" id="dropZone"><div class="upload-icon">↑</div><h3>أضف الصور والفيديو والصوت</h3><p>اختر الملفات من جهازك. تبقى الملفات في جلسة المتصفح ولا تُرفع إلى خادم.</p><button class="secondary" id="chooseFiles">اختيار الملفات</button></div><div id="mediaList" class="media-list"></div></section>
+    <section class="content hidden" id="videoView"><div class="section-heading"><div><span class="eyebrow">VIDEO WORKSPACE</span><h3>محرر الفيديو</h3></div><button class="primary small" id="videoImport">＋ إضافة مقاطع</button></div><div class="editor-panel"><div class="preview-area" id="videoPreview"><div class="preview-placeholder"><span>▶</span><b>معاينة الفيديو</b><small>استورد مقطعاً لعرضه هنا</small></div></div><div class="timeline-panel"><div class="timeline-head"><b>المخطط الزمني</b><span>المسارات — المرحلة الأولية</span></div><div class="track"><label>VIDEO 01</label><div class="track-line" id="videoTrack">اسحب ملفات الفيديو إلى مساحة العمل بعد الاستيراد</div></div><div class="track"><label>AUDIO 01</label><div class="track-line muted">مسار الصوت</div></div></div></div><p class="muted-note">المعاينة والاستيراد متاحان في هذه المرحلة. القص متعدد المقاطع والانتقالات والتصدير النهائي قيد التطوير.</p></section>
+    <section class="content hidden" id="imageView"><div class="section-heading"><div><span class="eyebrow">IMAGE WORKSPACE</span><h3>استوديو الصور</h3></div><button class="primary small" id="imageImport">＋ إضافة صور</button></div><div id="imageGallery" class="image-gallery"><div class="empty-state">استورد الصور لعرضها في مساحة العمل.</div></div><p class="muted-note">هذه المرحلة توفر تنظيم ومعاينة الصور. التوليد والتحرير الذكي وإزالة الخلفية ستضاف عند ربط محرك صور فعلي.</p></section>
+    <section class="content hidden" id="audioView"><div class="section-heading"><div><span class="eyebrow">AUDIO WORKSPACE</span><h3>الصوت والتعليق</h3></div><button class="primary small" id="audioImport">＋ إضافة صوت</button></div><div id="audioList" class="audio-list"><div class="empty-state">أضف ملفات صوتية لعرضها هنا.</div></div><p class="muted-note">إدارة الملفات والمعاينة أولاً؛ التسجيل، مزج المسارات وتوليد التعليق الصوتي مراحل لاحقة.</p></section>
+    <section class="content hidden" id="directorView"><div class="section-heading"><div><span class="eyebrow">AI DIRECTOR</span><h3>المخرج الذكي</h3></div><span class="status-chip">مخطط أولي متاح</span></div><div class="director-panel"><label for="briefInput">صف العمل الذي تريد إنتاجه</label><textarea id="briefInput" placeholder="مثال: أريد فيديو إعلان عمودي مدته 15 ثانية لمنتج، مع عناوين عربية وموسيقى هادئة..."></textarea><div class="director-controls"><select id="aspectSelect"><option value="9:16">عمودي 9:16</option><option value="16:9">أفقي 16:9</option><option value="1:1">مربع 1:1</option><option value="4:5">منشور 4:5</option></select><button class="primary" id="makePlan">إنشاء خطة إنتاج</button></div><div id="planResult" class="plan-result hidden"></div></div><p class="muted-note">الخطة الحالية تُبنى محلياً بقواعد ثابتة، وليست استجابة من نموذج ذكاء اصطناعي. ربط GPT-OSS/DeepSeek/Kimi يتطلب خدمة خلفية آمنة ومتاحة.</p></section>
+    <footer>TEa.G3 Studio <span>•</span> Web foundation 0.1.0 <span>•</span> بناء تدريجي، بوضوح وشفافية</footer>
+  </main>
+</div>
+<input id="fileInput" type="file" multiple accept="image/*,video/*,audio/*" hidden>
+<dialog id="projectDialog"><form method="dialog" id="projectForm"><div class="dialog-head"><div><span class="eyebrow">NEW WORKSPACE</span><h3>إنشاء مشروع جديد</h3></div><button class="icon-btn" value="cancel">✕</button></div><label for="projectName">اسم المشروع</label><input id="projectName" maxlength="80" placeholder="مثال: إعلان المنتج الجديد" required><label for="projectType">نوع المشروع</label><select id="projectType"><option>فيديو</option><option>صور</option><option>صوت</option><option>مشروع إبداعي</option></select><div class="dialog-actions"><button class="secondary" value="cancel">إلغاء</button><button class="primary" id="createProjectBtn" value="default">إنشاء المشروع</button></div></form></dialog>
+<dialog id="settingsDialog"><form method="dialog"><div class="dialog-head"><div><span class="eyebrow">SETTINGS</span><h3>إعدادات الاتصال</h3></div><button class="icon-btn" value="cancel">✕</button></div><label for="apiBase">عنوان API (اختياري)</label><input id="apiBase" type="url" placeholder="https://your-api.example.com"><p class="muted-note">لا تضع مفاتيح سرية هنا. لا يوجد خادم إنتاج متصل حالياً.</p><div class="dialog-actions"><button class="secondary" value="cancel">إغلاق</button><button class="primary" id="saveSettings" value="default">حفظ</button></div></form></dialog>
+<div class="toast" id="toast" role="status"></div>
+<script src="./app.js" defer></script>
+</body></html>
