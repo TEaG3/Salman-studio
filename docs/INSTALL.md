@@ -1,4 +1,4 @@
-# Frame Studio installation
+# TEa.G3-studio installation
 
 ## Requirements
 - Flutter stable SDK
