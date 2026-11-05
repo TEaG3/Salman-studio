@@ -27,10 +27,25 @@ def configuration() -> dict:
     provider = os.getenv("TEAG3_AI_PROVIDER", "rule_based").strip().lower()
     endpoint = os.getenv("TEAG3_OLLAMA_URL", DEFAULT_ENDPOINT).rstrip("/")
     model = os.getenv("TEAG3_OLLAMA_MODEL", DEFAULT_MODEL).strip()
-    timeout = float(os.getenv("TEAG3_OLLAMA_TIMEOUT_SECONDS", "90"))
-    parsed = urlparse(endpoint)
+    try:
+        timeout = float(os.getenv("TEAG3_OLLAMA_TIMEOUT_SECONDS", "90"))
+    except ValueError:
+        timeout = 90.0
     local_hosts = {"localhost", "127.0.0.1", "::1"}
-    safe_local = parsed.scheme == "http" and parsed.hostname in local_hosts and parsed.port in (None, 11434)
+    try:
+        parsed = urlparse(endpoint)
+        safe_local = (
+            parsed.scheme == "http"
+            and parsed.hostname in local_hosts
+            and parsed.port in (None, 11434)
+            and parsed.path in ("", "/")
+            and not parsed.query
+            and not parsed.fragment
+            and parsed.username is None
+            and parsed.password is None
+        )
+    except ValueError:
+        safe_local = False
     return {
         "provider": provider,
         "endpoint": endpoint,
@@ -67,9 +82,7 @@ async def model_status() -> dict:
             response.raise_for_status()
             payload = response.json()
         models = [item.get("name", "") for item in payload.get("models", [])]
-        available = config["model"] in models or any(
-            name.split(":")[0] == config["model"].split(":")[0] for name in models
-        )
+        available = config["model"] in models
         return {**base, "available": available, "state": "ready" if available else "model_not_downloaded"}
     except (httpx.HTTPError, ValueError):
         return {**base, "available": False, "state": "ollama_unreachable"}
