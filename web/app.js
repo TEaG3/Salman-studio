@@ -1,0 +1,32 @@
+(()=>{'use strict';
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const store={get(k,d){try{return JSON.parse(localStorage.getItem('teag3_'+k))??d}catch{return d}},set(k,v){localStorage.setItem('teag3_'+k,JSON.stringify(v))}};
+let projects=store.get('projects',[]),media=[],activeView='home',pendingType='all';
+const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600)};
+const titleMap={home:'لوحة الاستوديو',projects:'مشاريعي',media:'مكتبة الوسائط',video:'محرر الفيديو',image:'استوديو الصور',audio:'الصوت والتعليق',director:'المخرج الذكي'};
+function view(v){activeView=v;Object.keys(titleMap).forEach(k=>$('#'+k+'View')?.classList.toggle('hidden',k!==v));$('#pageTitle').textContent=titleMap[v]||titleMap.home;$$('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.view===v));$('#sidebar').classList.remove('open');if(v==='projects')renderProjects();if(v==='media')renderMedia();if(v==='image')renderImages();if(v==='audio')renderAudio();if(v==='home')renderProjects(true)}
+$$('[data-view]').forEach(b=>b.addEventListener('click',()=>view(b.dataset.view)));
+$('#menuBtn').onclick=()=>$('#sidebar').classList.toggle('open');
+function projectCard(p){return '<article class="project-card"><span class="project-type">'+escapeHtml(p.type)+'</span><b>'+escapeHtml(p.name)+'</b><small>تم الإنشاء: '+new Date(p.createdAt).toLocaleDateString('ar-IQ')+'</small></article>'}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function renderProjects(recent=false){const target=$(recent?'#recentProjects':'#allProjects');const list=projects.slice(0,recent?3:projects.length);target.innerHTML=list.length?list.map(projectCard).join(''):'<div class="empty-state">لا توجد مشاريع بعد. أنشئ مشروعك الأول للبدء.</div>'}
+function openProjectDialog(){$('#projectName').value='';$('#projectDialog').showModal();setTimeout(()=>$('#projectName').focus(),50)}
+['#newProject','#newProjectTop','#newProjectList'].forEach(s=>$(s).onclick=openProjectDialog);
+$('#createProjectBtn').addEventListener('click',e=>{e.preventDefault();const name=$('#projectName').value.trim();if(!name){toast('أدخل اسم المشروع أولاً');return}const p={id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),name,type:$('#projectType').value,createdAt:new Date().toISOString()};projects.unshift(p);store.set('projects',projects);$('#projectDialog').close();renderProjects(true);if(activeView==='projects')renderProjects();toast('تم إنشاء المشروع وحفظه في هذا المتصفح')});
+$('#settingsBtn').onclick=()=>{$('#apiBase').value=store.get('apiBase','');$('#settingsDialog').showModal()};
+$('#saveSettings').onclick=e=>{e.preventDefault();store.set('apiBase',$('#apiBase').value.trim().replace(/\/$/,''));$('#settingsDialog').close();toast('تم حفظ إعداد الاتصال')};
+const input=$('#fileInput');function choose(type='all'){pendingType=type;input.value='';input.click()}
+['#importHero','#importMedia','#chooseFiles'].forEach(s=>$(s).onclick=()=>{view('media');choose()});
+$('#videoImport').onclick=()=>choose('video');$('#imageImport').onclick=()=>choose('image');$('#audioImport').onclick=()=>choose('audio');
+input.addEventListener('change',()=>{const files=[...input.files].filter(f=>pendingType==='all'||f.type.startsWith(pendingType+'/'));files.forEach(f=>media.push({file:f,url:URL.createObjectURL(f),name:f.name,type:f.type,size:f.size}));renderMedia();renderImages();renderAudio();if(files.some(f=>f.type.startsWith('video/')))renderVideo();toast('تمت إضافة '+files.length+' ملف للمعاينة المؤقتة')});
+function formatSize(n){return n<1024*1024?(n/1024).toFixed(0)+' KB':(n/1024/1024).toFixed(1)+' MB'}
+function mediaRows(items){return items.map(m=>'<div class="media-item"><div class="media-thumb" style="display:grid;place-items:center">'+(m.type.startsWith('image/')?'▧':m.type.startsWith('video/')?'▶':'♫')+'</div><div><b>'+escapeHtml(m.name)+'</b><small>'+formatSize(m.size)+' · '+escapeHtml(m.type)+'</small></div></div>').join('')}
+function renderMedia(){$('#mediaList').innerHTML=media.length?mediaRows(media):'<div class="empty-state">لم تتم إضافة ملفات بعد.</div>'}
+function renderImages(){const a=media.filter(m=>m.type.startsWith('image/'));$('#imageGallery').innerHTML=a.length?a.map(m=>'<img src="'+m.url+'" alt="'+escapeHtml(m.name)+'" title="'+escapeHtml(m.name)+'">').join(''):'<div class="empty-state">استورد الصور لعرضها في مساحة العمل.</div>'}
+function renderAudio(){const a=media.filter(m=>m.type.startsWith('audio/'));$('#audioList').innerHTML=a.length?a.map(m=>'<div class="media-item"><div class="media-thumb">♫</div><div style="flex:1"><b>'+escapeHtml(m.name)+'</b><audio controls src="'+m.url+'" style="width:100%;height:32px;margin-top:7px"></audio></div></div>').join(''):'<div class="empty-state">أضف ملفات صوتية لعرضها هنا.</div>'}
+function renderVideo(){const m=media.find(x=>x.type.startsWith('video/'));if(!m)return;$('#videoPreview').innerHTML='<video controls playsinline src="'+m.url+'"></video>';$('#videoTrack').textContent=m.name}
+$('#dropZone').addEventListener('dragover',e=>{e.preventDefault();$('#dropZone').style.borderColor='#58d7ce'});$('#dropZone').addEventListener('dragleave',()=>$('#dropZone').style.borderColor='');$('#dropZone').addEventListener('drop',e=>{e.preventDefault();[...e.dataTransfer.files].forEach(f=>media.push({file:f,url:URL.createObjectURL(f),name:f.name,type:f.type,size:f.size}));renderMedia();toast('تمت إضافة الملفات للمعاينة')});
+$('#makePlan').onclick=()=>{const brief=$('#briefInput').value.trim();if(!brief){toast('اكتب وصف المشروع أولاً');return}const aspect=$('#aspectSelect').value;const names={'9:16':'عمودي 1080×1920','16:9':'أفقي 1920×1080','1:1':'مربع 1080×1080','4:5':'عمودي 1080×1350'};const steps=['تحليل وصف المشروع وتحديد الهدف والجمهور','تقسيم الفكرة إلى مشاهد قصيرة قابلة للتحرير','إعداد النصوص العربية ومراجعة اتجاه الكتابة RTL','تحديد مواضع الصور والمقاطع والصوت','مراجعة المقاس والتسلسل قبل التصدير'];$('#planResult').innerHTML='<b>خطة إنتاج أولية — '+names[aspect]+'</b><ol>'+steps.map(x=>'<li>'+x+'</li>').join('')+'</ol><p class="muted-note">هذه خطة إرشادية محلية فقط؛ لم يتم استدعاء نموذج ذكاء اصطناعي أو توليد ملفات.</p>';$('#planResult').classList.remove('hidden')};
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+renderProjects(true);
+})();
