@@ -24,6 +24,9 @@ def test_provider_is_disabled_by_default(monkeypatch):
         ("https://example.com", False),
         ("http://192.168.1.5:11434", False),
         ("http://127.0.0.1:8080", False),
+        ("http://user:pass@127.0.0.1:11434", False),
+        ("http://127.0.0.1:11434/proxy", False),
+        ("http://127.0.0.1:bad", False),
     ],
 )
 def test_only_local_ollama_endpoint_is_allowed(monkeypatch, url, expected):
