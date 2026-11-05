@@ -1,0 +1,171 @@
+openapi: 3.1.0
+info:
+  title: TEa.G3-studio API
+  version: 0.1.0
+  description: Provider-neutral API contract for TEa.G3 Android, web, and agent integrations.
+servers:
+  - url: https://api.example.invalid
+    description: Placeholder only; replace when a real backend is deployed.
+security:
+  - bearerAuth: []
+paths:
+  /v1/capabilities:
+    get:
+      operationId: getCapabilities
+      summary: Return the real capabilities of the connected media engine.
+      responses:
+        '200':
+          description: Capability registry.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [engineVersion, operations]
+                properties:
+                  engineVersion: { type: string }
+                  operations:
+                    type: array
+                    items: { type: string }
+  /v1/projects:
+    get:
+      operationId: listProjects
+      summary: List projects belonging to the authenticated user.
+      responses:
+        '200':
+          description: Project list.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, name, updatedAt]
+                      properties:
+                        id: { type: string }
+                        name: { type: string }
+                        updatedAt: { type: string, format: date-time }
+    post:
+      operationId: createProject
+      summary: Create a project record.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string, minLength: 1, maxLength: 120 }
+      responses:
+        '201':
+          description: Project created.
+  /v1/projects/{projectId}:
+    parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getProject
+      summary: Read project metadata and its edit decision list.
+      responses:
+        '200':
+          description: Project and EDL.
+    put:
+      operationId: saveProject
+      summary: Save a validated project and edit decision list.
+      responses:
+        '200':
+          description: Project saved.
+  /v1/projects/{projectId}/edit-plans:
+    post:
+      operationId: createEditPlan
+      summary: Convert an editing brief into a proposed edit decision list.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [brief]
+              properties:
+                brief: { type: string, minLength: 1, maxLength: 10000 }
+                selectedAssetIds:
+                  type: array
+                  items: { type: string }
+                language: { type: string, default: ar }
+                allowExternalAI:
+                  type: boolean
+                  default: false
+                  description: Must be true only after explicit user consent for this request.
+      responses:
+        '200':
+          description: Proposed plan; it is not rendered output.
+  /v1/projects/{projectId}/edit-plans/validate:
+    post:
+      operationId: validateEditPlan
+      summary: Validate clip references, time ranges, and engine capability support.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Validation report.
+  /v1/projects/{projectId}/renders:
+    post:
+      operationId: startRender
+      summary: Start an approved render. Requires explicit user approval.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [approved, profile]
+              properties:
+                approved: { type: boolean, const: true }
+                profile:
+                  type: object
+                  required: [container]
+                  properties:
+                    container: { type: string, const: mp4 }
+                    width: { type: integer, minimum: 1 }
+                    height: { type: integer, minimum: 1 }
+                    frameRate: { type: number, exclusiveMinimum: 0 }
+      responses:
+        '202':
+          description: Render job accepted.
+  /v1/renders/{renderId}:
+    get:
+      operationId: getRenderStatus
+      summary: Read render progress and verified output metadata.
+      parameters:
+        - name: renderId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Render job status.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
