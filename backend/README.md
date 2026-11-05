@@ -77,3 +77,48 @@ curl -X POST http://127.0.0.1:8000/v1/ai/chat \
 The chat endpoint returns text only. It does not generate image/video/audio files and does not call external media tools yet. When the provider is disabled or Ollama/model is unavailable, the endpoint returns HTTP 503 with an explicit reason. The rule-based planner remains available.
 
 For tests, from this directory run `python -m pytest -q`. Tests mock Ollama responses; they verify adapter logic but do not replace a real inference test on the target computer. Do not expose this unauthenticated backend publicly.
+
+
+## Additional open-weight local models: DeepSeek and Kimi
+
+The backend can select one local model provider per process. The adapter never calls a public API and rejects non-local endpoints.
+
+### DeepSeek R1 Distill 7B
+Official model: https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B
+
+Run a compatible local OpenAI-style inference server on port 8001, for example:
+
+```bash
+vllm serve deepseek-ai/DeepSeek-R1-Distill-Qwen-7B --host 127.0.0.1 --port 8001
+```
+
+Then, in PowerShell:
+
+```powershell
+$env:TEAG3_AI_PROVIDER="deepseek_local"
+$env:TEAG3_DEEPSEEK_URL="http://127.0.0.1:8001"
+$env:TEAG3_DEEPSEEK_MODEL="deepseek-ai/DeepSeek-R1-Distill-Qwen-7B"
+uvicorn app:app --reload
+```
+
+### Kimi-VL A3B Instruct
+Official model: https://huggingface.co/moonshotai/Kimi-VL-A3B-Instruct
+
+Run a compatible local OpenAI-style inference server on port 8002, following the current official model card:
+
+```bash
+vllm serve moonshotai/Kimi-VL-A3B-Instruct --host 127.0.0.1 --port 8002
+```
+
+Then, in PowerShell:
+
+```powershell
+$env:TEAG3_AI_PROVIDER="kimi_local"
+$env:TEAG3_KIMI_URL="http://127.0.0.1:8002"
+$env:TEAG3_KIMI_MODEL="moonshotai/Kimi-VL-A3B-Instruct"
+uvicorn app:app --reload
+```
+
+Only one provider is selected for each backend process. Use `GET /v1/ai/status` to check whether the configured model is loaded and `POST /v1/ai/chat` for a text-only request. Although Kimi-VL is multimodal, the current chat endpoint does not yet accept image/video uploads; visual request support is a separate implementation task.
+
+DeepSeek and Kimi model cards and deployment compatibility may change. Confirm the exact runtime/version against the upstream card before downloading. Model weights are open, but inference still needs suitable compute. No hosted paid endpoint is configured.
