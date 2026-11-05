@@ -4,15 +4,24 @@
 - Flutter stable SDK
 - Android Studio and Android SDK for Android builds
 - macOS with Xcode for iPadOS builds
+- Python 3 (used by the platform configuration script)
 
-## Prepare the project
+## Generate and configure Android/iOS projects
+
+From the repository root:
 
 ```bash
-flutter create . --platforms=android,ios
-flutter pub get
+bash tool/configure_platforms.sh
 flutter analyze
 flutter run
 ```
+
+The script runs Flutter's official project generator for Android and iOS, then applies:
+- App display name: `TEa.G3-studio`
+- Android application ID: `com.teag3.studio`
+- iOS bundle identifier: `com.teag3.studio`
+
+The generated native folders are local build inputs and are not committed to this branch.
 
 ## Build Android
 
@@ -28,7 +37,7 @@ On macOS:
 flutter build ios --release
 ```
 
-Then open `ios/Runner.xcworkspace` in Xcode and configure signing.
+Then open `ios/Runner.xcworkspace` in Xcode, select the Runner target, configure your Apple Developer Team and signing settings, and build for the intended device.
 
 ## Install agent skills
 
