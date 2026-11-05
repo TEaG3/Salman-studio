@@ -1,6 +1,6 @@
 # Salman-studio
 
-## Frame Studio
+## TEa.G3-studio
 
 A local-first Flutter video-editing starter targeting iPadOS and Android.
 
