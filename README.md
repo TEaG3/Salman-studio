@@ -23,6 +23,12 @@ uvicorn app:app --reload
 
 Open `http://127.0.0.1:8000/docs`. The backend is for local development only; it has no authentication and must not be exposed to the public internet.
 
+## Free hosting direction
+
+The target is a $0/month baseline without paid AI-agent subscriptions or required paid model APIs. The proposed hosting split is a static web frontend, a small FastAPI API, managed PostgreSQL, and object storage. Heavy AI generation is optional and remains unavailable unless genuinely free GPU compute is confirmed.
+
+See [Free-hosting architecture](docs/FREE-HOSTING-ARCHITECTURE.md) for provider choices, free-tier limitations, security requirements, and the staged migration plan. This is a target architecture, not a claim that cloud deployment is complete.
+
 ## Prepare Android
 
 Install Flutter stable, Android Studio, and the Android SDK. From the repository root:
@@ -57,6 +63,7 @@ GitHub Actions is configured to run Flutter analysis, tests, and a release APK b
 ## Architecture and development notes
 
 - [Platform architecture](docs/PLATFORM-ARCHITECTURE.md)
+- [Free-hosting architecture](docs/FREE-HOSTING-ARCHITECTURE.md)
 - [AI and model roadmap](docs/AI-AND-MODEL-ROADMAP.md)
 - [Open model and media-engine strategy](docs/OPEN-SOURCE-MODEL-STACK.md)
 - [Database model](docs/DATA-MODEL.md)
