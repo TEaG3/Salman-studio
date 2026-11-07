@@ -7,7 +7,7 @@ Deliver the responsive web workspace first for iPad 10 and desktop browsers. Kee
 - Static, RTL-first Arabic interface in `web/`.
 - Responsive navigation for tablet and phone widths.
 - Project creation saved in the current browser's localStorage.
-- Local image/video/audio import and temporary browser preview using object URLs.
+- Local image/video/audio import, persistent per-device IndexedDB storage, preview, and deletion.
 - A deterministic draft production checklist; it is not an LLM response.
 - PWA manifest and service worker for an installable/offline app shell.
 - GitHub Pages workflow validates the static app and deploys the `web/` directory.
@@ -21,7 +21,7 @@ The workflow needs Pages deployment permissions. If repository Pages is disabled
 
 ## Important current limits
 - Browser project records are local to that browser/device; there is no cross-device sync yet.
-- Imported media is held as temporary browser object URLs. It is not uploaded or persistently stored.
+- Imported media is persisted in browser IndexedDB on the current device. It is not uploaded or synced to other devices. Browser storage can still be cleared by the user or evicted by the browser.
 - The existing FastAPI service is local-development-only: SQLite, no authentication, no PostgreSQL ownership model, no secure object storage. Do not expose it publicly.
 - The web shell does not claim to generate images/video/audio. Generation, rendering, cloud sync, accounts and secure media storage remain unimplemented.
 - The API URL setting is a placeholder for a later authenticated integration; no secrets belong in the browser.
