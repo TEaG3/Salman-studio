@@ -62,6 +62,7 @@ $('#videoTimeline').addEventListener('click',e=>{const b=e.target.closest('[data
 $('#audioTimeline').addEventListener('click',e=>{const b=e.target.closest('[data-timeline-id]');if(!b)return;selectedClip={kind:'audio',id:b.dataset.timelineId};renderTimeline()});
 $('#playTimeline').onclick=async()=>{const queue=timeline.video.map(c=>({clip:c,item:timelineMedia(c.mediaId)})).filter(x=>x.item);if(!queue.length){toast('أضف مقاطع فيديو إلى المسار أولاً');return}const token=++playSequenceToken;let i=0;const playNext=()=>{if(token!==playSequenceToken||i>=queue.length){$('#timelineStatus').textContent='انتهت معاينة التسلسل';return}const {clip,item}=queue[i++];$('#videoPreview').innerHTML='<video controls playsinline autoplay src="'+item.url+'"></video>';const v=$('#videoPreview video');v.addEventListener('loadedmetadata',()=>{try{v.currentTime=Math.min(clip.start,Math.max(0,v.duration-.1));v.play().catch(()=>{})}catch{}});v.addEventListener('timeupdate',()=>{if(v.currentTime>=clip.end){v.pause();playNext()}});v.addEventListener('ended',playNext);$('#timelineStatus').textContent='معاينة المقطع '+i+' من '+queue.length};playNext()};
 renderTimeline();
-\nif('serviceWorker'in navigator&&location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+
+if('serviceWorker'in navigator&&location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 renderProjects(true);restoreMedia();
 })();
