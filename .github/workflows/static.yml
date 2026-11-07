@@ -6,6 +6,11 @@ on:
     paths:
       - "web/**"
       - ".github/workflows/static.yml"
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "web/**"
+      - ".github/workflows/static.yml"
   workflow_dispatch:
 
 permissions:
@@ -42,6 +47,7 @@ jobs:
           path: web
 
   deploy:
+    if: github.event_name != 'pull_request'
     needs: validate
     environment:
       name: github-pages
