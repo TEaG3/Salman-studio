@@ -10,7 +10,7 @@ The static web editor runs in a modern browser on Windows, macOS, Linux, iPad an
 
 - **Web:** available as a browser-based editor; works on Windows through Edge/Chrome/Firefox and on supported mobile browsers. It does not require a Windows installer.
 - **Android:** native Flutter app foundation; local import/preview/project saving and single-clip MP4 trim export. Native multi-track audio/video export is not implemented yet.
-- **Windows desktop:** planned native Flutter target, not yet generated, built, or tested. Until then, use the web editor in a Windows browser.
+- **Windows desktop:** native Flutter target is generated and built by Windows CI. The first test release is a portable ZIP containing the app executable and runtime files; native video export still needs Windows-specific implementation and testing. Until a release artifact is published, use the web editor in a Windows browser.
 - **iOS/iPadOS native app:** deferred; the web editor can be used in Safari, subject to browser limitations.
 
 ## Current Android app
