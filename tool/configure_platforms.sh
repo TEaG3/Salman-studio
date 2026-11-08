@@ -8,7 +8,7 @@ command -v flutter >/dev/null 2>&1 || { echo "Flutter SDK is required." >&2; exi
 command -v python3 >/dev/null 2>&1 || { echo "Python 3 is required." >&2; exit 1; }
 
 # Android is the first native target. iOS scaffolding is intentionally deferred.
-flutter create --platforms=android --org com.teag3 --project-name tea_g3_studio .
+flutter create --platforms=android,windows --org com.teag3 --project-name tea_g3_studio .
 
 python3 - <<'PY'
 from pathlib import Path
