@@ -80,6 +80,7 @@ async function exportTimelineWebM(){
   const videoDurations=[];
   for(const {clip,item} of queue){const v=document.createElement('video');v.preload='metadata';v.src=item.url;await new Promise((resolve,reject)=>{v.onloadedmetadata=resolve;v.onerror=()=>reject(new Error('تعذر قراءة '+item.name))});const start=Math.max(0,Number(clip.start)||0),end=Math.min(v.duration||Number(clip.end),Number(clip.end)||v.duration);if(!(end>start))throw new Error('مدة القص غير صالحة في '+item.name);videoDurations.push(end-start);v.removeAttribute('src');v.load()}
   const totalVideoDuration=videoDurations.reduce((a,b)=>a+b,0);
+  const decodedAudio=[];
   if(audioQueue.length){
    const AudioCtx=window.AudioContext||window.webkitAudioContext;if(!AudioCtx)throw new Error('هذا المتصفح لا يدعم مزج الصوت عبر Web Audio');
    audioContext=new AudioCtx();audioDestination=audioContext.createMediaStreamDestination();await audioContext.resume();
@@ -89,16 +90,22 @@ async function exportTimelineWebM(){
     const raw=await item.file.arrayBuffer(),buffer=await audioContext.decodeAudioData(raw);
     const start=Math.max(0,Number(clip.start)||0),end=Math.min(buffer.duration,Number(clip.end)||buffer.duration),duration=Math.min(end-start,totalVideoDuration-offset);
     if(!(duration>0))continue;
-    const source=audioContext.createBufferSource();source.buffer=buffer;source.connect(audioDestination);source.start(audioContext.currentTime+offset,start,duration);offset+=duration;
+    decodedAudio.push({buffer,start,duration,offset});offset+=duration;
    }
    audioDestination.stream.getAudioTracks().forEach(track=>stream.addTrack(track));
   }
   recorder.start(500);$('#timelineStatus').textContent=audioQueue.length?'يتم تصدير الفيديو مع مزج مقاطع الصوت بالتتابع…':'يتم تصدير الفيديو؛ لم تتم إضافة مقاطع صوتية.';
+  let audioStarted=false;
   for(let i=0;i<queue.length;i++){
    const {clip,item}=queue[i],v=document.createElement('video');v.src=item.url;v.muted=true;v.playsInline=true;v.preload='auto';
    await new Promise((resolve,reject)=>{v.onloadedmetadata=resolve;v.onerror=()=>reject(new Error('تعذر قراءة '+item.name))});
    const start=Math.max(0,clip.start||0),end=Math.min(Number.isFinite(v.duration)?v.duration:clip.end,clip.end||v.duration);
    v.currentTime=start;await new Promise(resolve=>{if(Math.abs(v.currentTime-start)<.05)return resolve();v.onseeked=resolve});
+   if(!audioStarted&&decodedAudio.length){
+    const audioStartAt=audioContext.currentTime+0.15;
+    for(const entry of decodedAudio){const source=audioContext.createBufferSource();source.buffer=entry.buffer;source.connect(audioDestination);source.start(audioStartAt+entry.offset,entry.start,entry.duration)}
+    audioStarted=true;
+   }
    await v.play();$('#timelineStatus').textContent='تصدير الفيديو '+(i+1)+' من '+queue.length;
    await new Promise((resolve,reject)=>{let raf=0;const tick=()=>{if(v.currentTime>=end||v.ended){cancelAnimationFrame(raf);v.pause();resolve();return}drawFrame(v);raf=requestAnimationFrame(tick)};v.onerror=()=>{cancelAnimationFrame(raf);reject(new Error('تعذر تشغيل '+item.name))};drawFrame(v);tick()});
    v.pause();v.removeAttribute('src');v.load();
