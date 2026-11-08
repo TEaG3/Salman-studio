@@ -63,6 +63,39 @@ $('#audioTimeline').addEventListener('click',e=>{const b=e.target.closest('[data
 $('#playTimeline').onclick=async()=>{const queue=timeline.video.map(c=>({clip:c,item:timelineMedia(c.mediaId)})).filter(x=>x.item);if(!queue.length){toast('أضف مقاطع فيديو إلى المسار أولاً');return}const token=++playSequenceToken;let i=0;const playNext=()=>{if(token!==playSequenceToken||i>=queue.length){$('#timelineStatus').textContent='انتهت معاينة التسلسل';return}const {clip,item}=queue[i++];$('#videoPreview').innerHTML='<video controls playsinline autoplay src="'+item.url+'"></video>';const v=$('#videoPreview video');v.addEventListener('loadedmetadata',()=>{try{v.currentTime=Math.min(clip.start,Math.max(0,v.duration-.1));v.play().catch(()=>{})}catch{}});v.addEventListener('timeupdate',()=>{if(v.currentTime>=clip.end){v.pause();playNext()}});v.addEventListener('ended',playNext);$('#timelineStatus').textContent='معاينة المقطع '+i+' من '+queue.length};playNext()};
 renderTimeline();
 
+async function exportTimelineWebM(){
+ const button=$('#exportTimeline');if(!window.MediaRecorder||!HTMLCanvasElement.prototype.captureStream){toast('التصدير غير مدعوم في هذا المتصفح؛ جرّب متصفحاً يدعم MediaRecorder');return}
+ const queue=timeline.video.map(c=>({clip:c,item:timelineMedia(c.mediaId)})).filter(x=>x.item);
+ if(!queue.length){toast('أضف مقاطع فيديو إلى المسار أولاً');return}
+ const mime=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(t=>MediaRecorder.isTypeSupported(t));
+ if(!mime){toast('هذا المتصفح لا يدعم ترميز WebM المطلوب');return}
+ const canvas=document.createElement('canvas');canvas.width=1280;canvas.height=720;
+ const ctx=canvas.getContext('2d');if(!ctx){toast('تعذر إنشاء مساحة التصدير');return}
+ const stream=canvas.captureStream(30);let recorder,chunks=[];
+ try{recorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:5000000})}catch(e){toast('تعذر بدء مسجل الفيديو: '+e.message);stream.getTracks().forEach(t=>t.stop());return}
+ const previous=button.textContent;button.disabled=true;button.textContent='جارٍ التصدير…';$('#timelineStatus').textContent='يتم تسجيل تسلسل الفيديو محلياً؛ الصوت غير مضمّن في هذه النسخة.';
+ const finished=new Promise((resolve,reject)=>{recorder.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};recorder.onerror=e=>reject(e.error||new Error('Recorder error'));recorder.onstop=()=>resolve(new Blob(chunks,{type:mime}))});
+ const drawFrame=v=>{ctx.fillStyle='#080d16';ctx.fillRect(0,0,canvas.width,canvas.height);const w=v.videoWidth||16,h=v.videoHeight||9,scale=Math.min(canvas.width/w,canvas.height/h),dw=w*scale,dh=h*scale;ctx.drawImage(v,(canvas.width-dw)/2,(canvas.height-dh)/2,dw,dh)};
+ try{
+  recorder.start(500);
+  for(let i=0;i<queue.length;i++){
+   const {clip,item}=queue[i],v=document.createElement('video');v.src=item.url;v.muted=true;v.playsInline=true;v.preload='auto';
+   await new Promise((resolve,reject)=>{v.onloadedmetadata=resolve;v.onerror=()=>reject(new Error('تعذر قراءة '+item.name))});
+   const start=Math.max(0,clip.start||0),end=Math.min(Number.isFinite(v.duration)?v.duration:clip.end,clip.end||v.duration);
+   if(!(end>start))throw new Error('مدة القص غير صالحة في '+item.name);
+   v.currentTime=start;await new Promise(resolve=>{if(Math.abs(v.currentTime-start)<.05)return resolve();v.onseeked=resolve});
+   await v.play();$('#timelineStatus').textContent='تصدير المقطع '+(i+1)+' من '+queue.length;
+   await new Promise((resolve,reject)=>{let raf=0;const tick=()=>{if(v.currentTime>=end||v.ended){cancelAnimationFrame(raf);v.pause();resolve();return}drawFrame(v);raf=requestAnimationFrame(tick)};v.onerror=()=>{cancelAnimationFrame(raf);reject(new Error('تعذر تشغيل '+item.name))};drawFrame(v);tick()});
+   v.pause();v.removeAttribute('src');v.load();
+  }
+  recorder.stop();const blob=await finished;if(!blob.size)throw new Error('ملف التصدير فارغ');
+  const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='teag3-export-'+new Date().toISOString().replace(/[:.]/g,'-')+'.webm';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
+  $('#timelineStatus').textContent='اكتمل تصدير الفيديو بصيغة WebM (من دون صوت).';toast('تم إنشاء ملف WebM محلياً');
+ }catch(e){if(recorder.state!=='inactive')recorder.stop();try{await finished}catch{}$('#timelineStatus').textContent='فشل التصدير: '+e.message;toast('تعذر التصدير: '+e.message)}
+ finally{stream.getTracks().forEach(t=>t.stop());button.disabled=false;button.textContent=previous}
+}
+$('#exportTimeline').onclick=exportTimelineWebM;
+
 if('serviceWorker'in navigator&&location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 renderProjects(true);restoreMedia();
 })();
