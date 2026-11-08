@@ -2,6 +2,17 @@
 
 TEa.G3-studio is being developed as a hybrid AI creative-production platform for personal video editing, portraits and image work, motion graphics, animation, bilingual typography, audio, and advertising. Android is the first native target; iOS is deferred.
 
+## Current web editor
+
+The static web editor runs in a modern browser on Windows, macOS, Linux, iPad and Android. It supports local media import, browser-local media/project storage, a multi-clip video/audio timeline, source in/out trimming, sequence preview, and WebM export. Web export now mixes audio clips into the video output when the browser supports Web Audio and MediaRecorder. Audio clips are currently sequenced from the beginning of the video; independent clip placement, overlapping tracks, fades, effects and transitions are not available yet. Browser/device compatibility must be checked, especially on iPad Safari.
+
+## Platform support status
+
+- **Web:** available as a browser-based editor; works on Windows through Edge/Chrome/Firefox and on supported mobile browsers. It does not require a Windows installer.
+- **Android:** native Flutter app foundation; local import/preview/project saving and single-clip MP4 trim export. Native multi-track audio/video export is not implemented yet.
+- **Windows desktop:** planned native Flutter target, not yet generated, built, or tested. Until then, use the web editor in a Windows browser.
+- **iOS/iPadOS native app:** deferred; the web editor can be used in Safari, subject to browser limitations.
+
 ## Current Android app
 
 The Flutter Android editor supports local video import, source preview, a clip list, saved in/out points, local JSON project persistence, and single-clip MP4 trimming through Jetpack Media3 Transformer. It is not yet a full multi-track editor.
