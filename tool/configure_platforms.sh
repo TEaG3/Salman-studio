@@ -57,7 +57,7 @@ else:
     dependency = '    implementation "androidx.media3:media3-transformer:1.11.1"'
 if count != 1:
     raise SystemExit("Could not safely set Android applicationId.")
-if not re.search(r"compileSdk(?:Version)?\\s*(?:=\\s*)?36", gradle_text):
+if not re.search(r"compileSdk(?:Version)?\s*(?:=\s*)?36", gradle_text):
     raise SystemExit("Could not safely set Android compileSdk to API 36.")
 if "androidx.media3:media3-transformer" not in gradle_text:
     if re.search(r'\ndependencies\s*\{', gradle_text):
