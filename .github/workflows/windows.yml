@@ -1,0 +1,63 @@
+name: Windows Desktop CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "lib/**"
+      - "test/**"
+      - "pubspec.yaml"
+      - "pubspec.lock"
+      - "tool/**"
+      - ".github/workflows/windows.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "lib/**"
+      - "test/**"
+      - "pubspec.yaml"
+      - "pubspec.lock"
+      - "tool/**"
+      - ".github/workflows/windows.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Generate Android and Windows project files
+        shell: bash
+        run: bash tool/configure_platforms.sh
+      - name: Resolve Flutter packages
+        run: flutter pub get
+      - name: Analyze Dart code
+        run: flutter analyze --fatal-infos
+      - name: Run Flutter tests
+        run: flutter test
+      - name: Build Windows release
+        run: flutter build windows --release
+      - name: Package portable Windows app
+        shell: pwsh
+        run: |
+          $source = "build/windows/x64/runner/Release"
+          if (!(Test-Path "$source/tea_g3_studio.exe")) {
+            Get-ChildItem $source
+            throw "Windows executable was not produced."
+          }
+          Compress-Archive -Path "$source/*" -DestinationPath "TEaG3-Studio-Windows-x64.zip" -Force
+      - name: Upload Windows test build
+        uses: actions/upload-artifact@v4
+        with:
+          name: TEaG3-Studio-Windows-x64
+          path: TEaG3-Studio-Windows-x64.zip
+          if-no-files-found: error
+          retention-days: 14
