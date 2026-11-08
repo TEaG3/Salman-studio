@@ -43,6 +43,7 @@ if gradle.name.endswith(".kts"):
         count=1,
     )
     gradle_text = re.sub(r'minSdk\s*=\s*[^\s]+', 'minSdk = 23', gradle_text, count=1)
+    gradle_text = re.sub(r'compileSdk\s*=\s*[^\s]+', 'compileSdk = 36', gradle_text, count=1)
     dependency = '    implementation("androidx.media3:media3-transformer:1.11.1")'
 else:
     gradle_text, count = re.subn(
@@ -52,9 +53,12 @@ else:
         count=1,
     )
     gradle_text = re.sub(r'minSdkVersion\s+[^\s]+', 'minSdkVersion 23', gradle_text, count=1)
+    gradle_text = re.sub(r'compileSdkVersion\s+[^\s]+', 'compileSdkVersion 36', gradle_text, count=1)
     dependency = '    implementation "androidx.media3:media3-transformer:1.11.1"'
 if count != 1:
     raise SystemExit("Could not safely set Android applicationId.")
+if not re.search(r"compileSdk(?:Version)?\\s*(?:=\\s*)?36", gradle_text):
+    raise SystemExit("Could not safely set Android compileSdk to API 36.")
 if "androidx.media3:media3-transformer" not in gradle_text:
     if re.search(r'\ndependencies\s*\{', gradle_text):
         gradle_text = re.sub(
