@@ -39,18 +39,23 @@ $('#dropZone').addEventListener('dragover',e=>{e.preventDefault();$('#dropZone')
 $('#makePlan').onclick=()=>{const brief=$('#briefInput').value.trim();if(!brief){toast('اكتب وصف المشروع أولاً');return}const aspect=$('#aspectSelect').value;const names={'9:16':'عمودي 1080×1920','16:9':'أفقي 1920×1080','1:1':'مربع 1080×1080','4:5':'عمودي 1080×1350'};const steps=['تحليل وصف المشروع وتحديد الهدف والجمهور','تقسيم الفكرة إلى مشاهد قصيرة قابلة للتحرير','إعداد النصوص العربية ومراجعة اتجاه الكتابة RTL','تحديد مواضع الصور والمقاطع والصوت','مراجعة المقاس والتسلسل قبل التصدير'];$('#planResult').innerHTML='<b>خطة إنتاج أولية — '+names[aspect]+'</b><ol>'+steps.map(x=>'<li>'+x+'</li>').join('')+'</ol><p class="muted-note">هذه خطة إرشادية محلية فقط؛ لم يتم استدعاء نموذج ذكاء اصطناعي أو توليد ملفات.</p>';$('#planResult').classList.remove('hidden')};
 
 /* Local multi-track timeline editor */
-let timeline=store.get('timeline',{video:[],audio:[]}),selectedClip=null,playSequenceToken=0;
+let timeline=store.get('timeline',{video:[],audio:[],captions:[]}),selectedClip=null,playSequenceToken=0;
+timeline.captions=Array.isArray(timeline.captions)?timeline.captions:[];
 const timelineMedia=id=>media.find(m=>m.id===id);
 function durationOf(item){return item?.duration||0}
 function renderTimeline(){
  const draw=(kind,target)=>{const list=timeline[kind]||[];$(target).innerHTML=list.length?list.map((clip,i)=>{const item=timelineMedia(clip.mediaId);return '<button class="timeline-clip '+(kind==='audio'?'audio ':'')+(selectedClip?.kind===kind&&selectedClip?.id===clip.id?'selected':'')+'" data-timeline-kind="'+kind+'" data-timeline-id="'+clip.id+'"><b>'+escapeHtml(item?.name||'ملف غير متاح')+'</b><small>'+Number(clip.start||0).toFixed(1)+'s — '+Number(clip.end||0).toFixed(1)+'s · '+(i+1)+'</small></button>'}).join(''):'<span class="timeline-empty">لا توجد مقاطع في هذا المسار</span>'};
  draw('video','#videoTimeline');draw('audio','#audioTimeline');
- $('#timelineStatus').textContent='فيديو: '+timeline.video.length+' مقاطع · صوت: '+timeline.audio.length+' مقاطع';
- renderInspector();
+ $('#timelineStatus').textContent='فيديو: '+timeline.video.length+' مقاطع · صوت: '+timeline.audio.length+' مقاطع · نصوص: '+timeline.captions.length;
+ renderInspector();renderCaptions();
 }
 function saveTimeline(){if(!store.set('timeline',timeline))toast('تعذر حفظ المخطط الزمني محلياً')}
 function addTimeline(kind){const candidates=media.filter(m=>m.type.startsWith(kind==='video'?'video/':'audio/'));if(!candidates.length){toast(kind==='video'?'استورد فيديو أولاً من مكتبة الوسائط':'استورد ملفاً صوتياً أولاً');return}const item=candidates[0];const clip={id:crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random(),mediaId:item.id,start:0,end:item.duration||30};timeline[kind].push(clip);selectedClip={kind,id:clip.id};saveTimeline();renderTimeline();toast('أضيف المقطع إلى المسار')}
 $('#addVideoToTimeline').onclick=()=>addTimeline('video');$('#addAudioToTimeline').onclick=()=>addTimeline('audio');
+function renderCaptions(){const host=$('#captionList');if(!host)return;host.innerHTML=timeline.captions.length?timeline.captions.map((c,i)=>'<div class="caption-item"><span class="caption-index">'+(i+1)+'</span><div class="caption-copy"><b>'+escapeHtml(c.text)+'</b><small>'+Number(c.start).toFixed(1)+'s — '+Number(c.end).toFixed(1)+'s</small></div><button class="icon-btn" data-remove-caption="'+escapeHtml(c.id)+'" aria-label="حذف النص">×</button></div>').join(''):'<span class="muted-note">لا توجد نصوص بعد.</span>'}
+$('#addCaption').onclick=()=>{const text=$('#captionText').value.trim(),start=Number($('#captionStart').value),end=Number($('#captionEnd').value);if(!text){toast('اكتب النص أولاً');return}if(!Number.isFinite(start)||!Number.isFinite(end)||start<0||end<=start){toast('تحقق من وقت بداية النص ونهايته');return}timeline.captions.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random(),text:text.slice(0,240),start,end});saveTimeline();renderTimeline();$('#captionText').value='';toast('تمت إضافة النص إلى مسار الترجمة')};
+$('#captionList').addEventListener('click',e=>{const b=e.target.closest('[data-remove-caption]');if(!b)return;timeline.captions=timeline.captions.filter(c=>c.id!==b.dataset.removeCaption);saveTimeline();renderTimeline();toast('تم حذف النص')});
+
 function renderInspector(){const host=$('#clipInspector');if(!selectedClip){host.innerHTML='<span class="muted-note">اختر مقطعاً لتعديل نقطة البداية والنهاية وترتيبه.</span>';return}const list=timeline[selectedClip.kind],i=list.findIndex(c=>c.id===selectedClip.id),clip=list[i],item=timelineMedia(clip?.mediaId);if(!clip){selectedClip=null;host.innerHTML='';return}if(item?.duration&&clip.end>item.duration){clip.end=item.duration;saveTimeline()}host.innerHTML='<div style="min-width:180px;flex:1"><b>'+escapeHtml(item?.name||'مقطع')+'</b><div class="muted-note">'+(selectedClip.kind==='video'?'مسار الفيديو':'مسار الصوت')+'</div></div><label>بداية المصدر (ثانية)<input id="clipStart" type="number" min="0" step="0.1" value="'+clip.start+'"></label><label>نهاية المصدر (ثانية)<input id="clipEnd" type="number" min="0.1" step="0.1" value="'+clip.end+'"></label><div class="clip-actions"><button class="secondary" id="clipEarlier" '+(i===0?'disabled':'')+'>← تقديم</button><button class="secondary" id="clipLater" '+(i===list.length-1?'disabled':'')+'>تأخير →</button><button class="secondary" id="clipRemove">حذف المقطع</button></div>';
  $('#clipStart').onchange=()=>{const v=Number($('#clipStart').value);if(!Number.isFinite(v)||v<0||v>=clip.end){toast('قيمة البداية غير صالحة');renderInspector();return}clip.start=v;saveTimeline();renderTimeline()};
  $('#clipEnd').onchange=()=>{const v=Number($('#clipEnd').value);if(!Number.isFinite(v)||v<=clip.start){toast('قيمة النهاية يجب أن تكون أكبر من البداية');renderInspector();return}clip.end=v;saveTimeline();renderTimeline()};
@@ -75,7 +80,10 @@ async function exportTimelineWebM(){
  const stream=canvas.captureStream(30);let recorder,chunks=[],audioContext=null,audioDestination=null;
  const previous=button.textContent;button.disabled=true;button.textContent='جارٍ التصدير…';
  const finished=new Promise((resolve,reject)=>{let activeRecorder;recorder=activeRecorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:5000000,audioBitsPerSecond:192000});activeRecorder.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};activeRecorder.onerror=e=>reject(e.error||new Error('Recorder error'));activeRecorder.onstop=()=>resolve(new Blob(chunks,{type:mime}))});
- const drawFrame=v=>{ctx.fillStyle='#080d16';ctx.fillRect(0,0,canvas.width,canvas.height);const w=v.videoWidth||16,h=v.videoHeight||9,scale=Math.min(canvas.width/w,canvas.height/h),dw=w*scale,dh=h*scale;ctx.drawImage(v,(canvas.width-dw)/2,(canvas.height-dh)/2,dw,dh)};
+ const drawFrame=(v,elapsed=0)=>{ctx.fillStyle='#080d16';ctx.fillRect(0,0,canvas.width,canvas.height);const w=v.videoWidth||16,h=v.videoHeight||9,scale=Math.min(canvas.width/w,canvas.height/h),dw=w*scale,dh=h*scale;ctx.drawImage(v,(canvas.width-dw)/2,(canvas.height-dh)/2,dw,dh);
+  const active=timeline.captions.filter(c=>elapsed>=Number(c.start)&&elapsed<=Number(c.end));
+  if(active.length){ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';ctx.direction='rtl';ctx.font='bold 38px "Arial",sans-serif';active.forEach((c,i)=>{const y=canvas.height-90-(active.length-1-i)*54;const maxWidth=canvas.width-100;const words=String(c.text).split(/\\s+/);let lines=[],line='';for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>maxWidth&&line){lines.push(line);line=word}else line=test}if(line)lines.push(line);lines.slice(0,2).forEach((ln,j)=>{const yy=y+(j-(Math.min(lines.length,2)-1)/2)*48;const tw=ctx.measureText(ln).width;ctx.fillStyle='rgba(0,0,0,.68)';ctx.fillRect((canvas.width-Math.min(maxWidth,tw+42))/2,yy-25,Math.min(maxWidth,tw+42),50);ctx.fillStyle='#fff';ctx.fillText(ln,canvas.width/2,yy,maxWidth)});});ctx.restore()}
+ };
  try{
   const videoDurations=[];
   for(const {clip,item} of queue){const v=document.createElement('video');v.preload='metadata';v.src=item.url;await new Promise((resolve,reject)=>{v.onloadedmetadata=resolve;v.onerror=()=>reject(new Error('تعذر قراءة '+item.name))});const start=Math.max(0,Number(clip.start)||0),end=Math.min(v.duration||Number(clip.end),Number(clip.end)||v.duration);if(!(end>start))throw new Error('مدة القص غير صالحة في '+item.name);videoDurations.push(end-start);v.removeAttribute('src');v.load()}
@@ -94,14 +102,15 @@ async function exportTimelineWebM(){
    audioDestination.stream.getAudioTracks().forEach(track=>stream.addTrack(track));
   }
   recorder.start(500);$('#timelineStatus').textContent=audioQueue.length?'يتم تصدير الفيديو مع مزج مقاطع الصوت بالتتابع…':'يتم تصدير الفيديو؛ لم تتم إضافة مقاطع صوتية.';
+  let elapsedVideo=0;
   for(let i=0;i<queue.length;i++){
    const {clip,item}=queue[i],v=document.createElement('video');v.src=item.url;v.muted=true;v.playsInline=true;v.preload='auto';
    await new Promise((resolve,reject)=>{v.onloadedmetadata=resolve;v.onerror=()=>reject(new Error('تعذر قراءة '+item.name))});
    const start=Math.max(0,clip.start||0),end=Math.min(Number.isFinite(v.duration)?v.duration:clip.end,clip.end||v.duration);
    v.currentTime=start;await new Promise(resolve=>{if(Math.abs(v.currentTime-start)<.05)return resolve();v.onseeked=resolve});
    await v.play();$('#timelineStatus').textContent='تصدير الفيديو '+(i+1)+' من '+queue.length;
-   await new Promise((resolve,reject)=>{let raf=0;const tick=()=>{if(v.currentTime>=end||v.ended){cancelAnimationFrame(raf);v.pause();resolve();return}drawFrame(v);raf=requestAnimationFrame(tick)};v.onerror=()=>{cancelAnimationFrame(raf);reject(new Error('تعذر تشغيل '+item.name))};drawFrame(v);tick()});
-   v.pause();v.removeAttribute('src');v.load();
+   await new Promise((resolve,reject)=>{let raf=0;const tick=()=>{if(v.currentTime>=end||v.ended){cancelAnimationFrame(raf);v.pause();resolve();return}drawFrame(v,elapsedVideo+Math.max(0,v.currentTime-start));raf=requestAnimationFrame(tick)};v.onerror=()=>{cancelAnimationFrame(raf);reject(new Error('تعذر تشغيل '+item.name))};drawFrame(v,elapsedVideo);tick()});
+   elapsedVideo+=Math.max(0,end-start);v.pause();v.removeAttribute('src');v.load();
   }
   recorder.stop();const blob=await finished;if(!blob.size)throw new Error('ملف التصدير فارغ');
   const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='teag3-export-'+new Date().toISOString().replace(/[:.]/g,'-')+'.webm';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
